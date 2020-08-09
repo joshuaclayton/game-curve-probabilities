@@ -9,3 +9,5 @@ license = "MIT"
 
 [dependencies]
 nom = "5"
+rand = "0.7"
+structopt = "0.3"

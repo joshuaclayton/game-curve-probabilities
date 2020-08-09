@@ -1,5 +1,6 @@
 use super::DiceProbabilities;
 
+#[derive(Clone, Debug)]
 pub enum Die {
     D4,
     D6,

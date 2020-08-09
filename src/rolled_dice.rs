@@ -1,6 +1,18 @@
 use super::probabilities;
 use super::{DiceProbabilities, Die};
+use rand::distributions::Uniform;
+use rand::prelude::*;
 use std::default::Default;
+
+pub struct RollOutcome {
+    pub rolls: Vec<(Die, usize)>,
+}
+
+impl RollOutcome {
+    pub fn total(&self) -> usize {
+        self.rolls.iter().map(|v| v.1).sum()
+    }
+}
 
 #[derive(Debug)]
 pub struct RolledDice {
@@ -50,5 +62,26 @@ impl RolledDice {
             Die::D12 => self.d12 += count,
             Die::D20 => self.d20 += count,
         }
+    }
+
+    pub fn roll(&self, mut rng: ThreadRng) -> RollOutcome {
+        let mut rolls = vec![];
+
+        for die in vec![
+            std::iter::repeat(Die::D4).take(self.d4),
+            std::iter::repeat(Die::D6).take(self.d6),
+            std::iter::repeat(Die::D8).take(self.d8),
+            std::iter::repeat(Die::D10).take(self.d10),
+            std::iter::repeat(Die::D12).take(self.d12),
+            std::iter::repeat(Die::D20).take(self.d20),
+        ]
+        .into_iter()
+        .flatten()
+        {
+            let distribution = Uniform::new_inclusive(die.minimum(), die.maximum());
+            rolls.push((die, distribution.sample(&mut rng)));
+        }
+
+        RollOutcome { rolls }
     }
 }

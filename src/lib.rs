@@ -1,3 +1,4 @@
+pub mod cli;
 mod dice;
 pub mod parser;
 pub mod probabilities;
