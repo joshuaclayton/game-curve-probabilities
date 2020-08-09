@@ -2,6 +2,7 @@ use super::probabilities;
 use super::{DiceProbabilities, Die};
 use rand::distributions::Uniform;
 use rand::prelude::*;
+use rayon::prelude::*;
 use std::default::Default;
 
 pub struct RollOutcome {
@@ -47,10 +48,12 @@ impl RolledDice {
         let d20s = probabilities::build(Die::D20, self.d20);
 
         vec![d4s, d6s, d8s, d10s, d12s, d20s]
-            .iter()
-            .fold(DiceProbabilities::default(), |acc, x| {
-                probabilities::add(&acc, &x)
-            })
+            .into_iter()
+            .par_bridge()
+            .reduce(
+                || DiceProbabilities::default(),
+                |acc, x| probabilities::add(&acc, &x),
+            )
     }
 
     pub fn add_dice(&mut self, count: &usize, die: &Die) {

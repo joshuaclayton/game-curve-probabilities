@@ -1,4 +1,5 @@
 use super::Die;
+use rayon::prelude::*;
 use std::collections::HashMap;
 
 pub type DiceProbabilities = HashMap<usize, f32>;
@@ -31,5 +32,6 @@ pub fn add(left: &DiceProbabilities, right: &DiceProbabilities) -> DiceProbabili
 pub fn build(die: Die, times: usize) -> DiceProbabilities {
     std::iter::repeat(die.probabilities())
         .take(times)
-        .fold(DiceProbabilities::default(), |acc, x| add(&acc, &x))
+        .par_bridge()
+        .reduce(|| DiceProbabilities::default(), |acc, x| add(&acc, &x))
 }
